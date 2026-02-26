@@ -7,11 +7,14 @@
 
 import SwiftUI
 
+// 앱의 메인 엔트리 포인트(예: deskClockApp.swift)에서 ContentView 대신 사용
 @main
-struct deskClockAppApp: App {
+struct deskClockApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ClockContainerView()
+                .edgesIgnoringSafeArea(.all)
         }
     }
 }
+

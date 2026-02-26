@@ -10,9 +10,22 @@
 		07EC9A4A2F5004F600F502F9 /* deskClockApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = deskClockApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		07EC9A6E2F500F4900F502F9 /* Exceptions for "deskClockApp" folder in "deskClockApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				view/Untitled.swift,
+			);
+			target = 07EC9A492F5004F600F502F9 /* deskClockApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		07EC9A4C2F5004F600F502F9 /* deskClockApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				07EC9A6E2F500F4900F502F9 /* Exceptions for "deskClockApp" folder in "deskClockApp" target */,
+			);
 			path = deskClockApp;
 			sourceTree = "<group>";
 		};

@@ -1,24 +1,15 @@
-//
-//  WorldClock.swift
-//  deskClockApp
-//
-//  Created by protrek on 2/25/26.
-//
+import Foundation
 
-struct WorldClock {
+struct WorldClockModel {
     let cityName: String
-    let timeZoneIdentifier: String
     let country: String
+    let timeZoneIdentifier: String
     
-    var currentTime: Date {
-        return Date()
-    }
-    
-    // 타임존에 맞는 시간 문자열 생성
-    func getTimeString() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm"
-        formatter.timeZone = TimeZone(identifier: timeZoneIdentifier)
-        return formatter.string(from: currentTime)
+    // 타임존이 적용된 현재 날짜 반환
+    var localTime: Date {
+        let now = Date()
+        let tz = TimeZone(identifier: timeZoneIdentifier) ?? .current
+        let seconds = TimeInterval(tz.secondsFromGMT(for: now))
+        return now.addingTimeInterval(seconds - TimeInterval(TimeZone.current.secondsFromGMT(for: now)))
     }
 }
