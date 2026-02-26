@@ -84,6 +84,47 @@ class AnalogClockView: UIView {
 //        [hourHand, minuteHand, secondHand, centerDot].forEach { $0.center = center }
 //    }
 
+    // AnalogClockView.swift 수정
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        
+        
+        // 시계판의 점들을 모두 지우고 새로 그려야 바뀐 크기에 맞게 재배치됩니다.
+        // (또는 기존 점들의 center 값만 업데이트하는 로직이 필요합니다.)
+        self.subviews.filter { $0 is UILabel || $0.layer.cornerRadius > 0 }.forEach {
+            if $0 != innerCircle && $0 != outerCircle && $0 != centerDot {
+                $0.removeFromSuperview()
+            }
+        }
+        
+        setupClockFaceCircle() // 바뀐 크기(frame)에 맞춰 다시 그리기
+        
+        let center = CGPoint(x: bounds.midX, y: bounds.midY)
+        
+         // 이중 원형 구조 배치
+        outerCircle.frame = bounds
+        outerCircle.layer.cornerRadius = bounds.width / 2
+        
+        let innerSide = bounds.width * 0.08
+        innerCircle.frame = CGRect(x: 0, y: 0, width: innerSide, height: innerSide)
+        innerCircle.center = center
+        innerCircle.layer.cornerRadius = innerSide / 2
+
+        // 중요: 이미 구성되었다면 다시 그리지 않음 (중복 방지)
+        if !isFaceConfigured {
+            setupClockFaceCircle() // 원형 점 눈금 생성
+            isFaceConfigured = true
+        }
+
+        
+        [hourHand, minuteHand, secondHand, centerDot, innerCircle, outerCircle].forEach {
+            $0.center = center
+        }
+    }
+    
+#if NOT_LANDSCAPE
     override func layoutSubviews() {
         super.layoutSubviews()
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
@@ -106,6 +147,8 @@ class AnalogClockView: UIView {
         // 바늘 위치 초기화
         [hourHand, minuteHand, secondHand, centerDot].forEach { $0.center = center }
     }
+#endif // NOT_LANDSCAPE
+    
     // 눈금 추가 (선택 사항)
     private func setupTicks(radius: CGFloat) {
         let center = CGPoint(x: bounds.midX, y: bounds.midY)

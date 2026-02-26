@@ -16,6 +16,9 @@ class ClockViewController: UIViewController {
     // Timer 대신 CADisplayLink 사용
     private var displayLink: CADisplayLink? // Timer 대신 사용
     let customTabBar = CustomTabBarView()
+    
+    private var landscapeConstraints: [NSLayoutConstraint] = []
+    private var portraitConstraints: [NSLayoutConstraint] = []
  
     
     override func viewDidLoad() {
@@ -26,13 +29,56 @@ class ClockViewController: UIViewController {
         //startClockTimer()
         startClock()
     }
+    // 화면 방향이 바뀔 때 호출되는 메서드
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        coordinator.animate(alongsideTransition: { _ in
+            if size.width > size.height {
+                // 가로 모드일 때
+                NSLayoutConstraint.deactivate(self.portraitConstraints)
+                NSLayoutConstraint.activate(self.landscapeConstraints)
+            } else {
+                // 세로 모드일 때
+                NSLayoutConstraint.deactivate(self.landscapeConstraints)
+                NSLayoutConstraint.activate(self.portraitConstraints)
+            }
+            self.view.layoutIfNeeded()
+        })
+    }
     
     private func setupLayout() {
         [analogClock, cityCard, customTabBar].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
+        
+        // 1. 공통 제약 조건 (어떤 방향이든 똑같은 것)
+        analogClock.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
 
+        // 2. 세로 모드 전용 제약 조건
+        portraitConstraints = [
+            analogClock.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 150),
+            analogClock.widthAnchor.constraint(equalToConstant: 280),
+            analogClock.heightAnchor.constraint(equalToConstant: 280),
+            cityCard.topAnchor.constraint(equalTo: analogClock.bottomAnchor, constant: 60)
+        ]
+
+        // 3. 가로 모드 전용 제약 조건 (시계를 더 크게 만들고 카드 위치 조정)
+        landscapeConstraints = [
+            analogClock.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            analogClock.widthAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.8), // 화면 높이의 80% 크기
+            analogClock.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.8),
+            cityCard.leadingAnchor.constraint(equalTo: analogClock.trailingAnchor, constant: 20) // 시계 옆으로 이동
+        ]
+
+        // 초기 방향에 맞춰 활성화
+        if view.frame.width > view.frame.height {
+            NSLayoutConstraint.activate(landscapeConstraints)
+        } else {
+            NSLayoutConstraint.activate(portraitConstraints)
+        }
+#if NOT_LANDSCAPE
         NSLayoutConstraint.activate([
             // 1. 아날로그 시계: 화면 상단에서 일정 거리 유지
             analogClock.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 150),
@@ -52,6 +98,7 @@ class ClockViewController: UIViewController {
             customTabBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             customTabBar.heightAnchor.constraint(equalToConstant: 70)
         ])
+#endif // NOT_LANDSCAPE
     }
 
     private func startClockTimer() {
