@@ -15,40 +15,43 @@ class ClockViewController: UIViewController {
     
     // Timer 대신 CADisplayLink 사용
     private var displayLink: CADisplayLink? // Timer 대신 사용
+    let customTabBar = CustomTabBarView()
+ 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        //view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor(white: 0.95, alpha: 1.0) // 연한 회색 배경
         setupLayout()
         //startClockTimer()
         startClock()
     }
     
     private func setupLayout() {
-        // 2. 아날로그 시계 추가 및 위치 설정
-        analogClock.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(analogClock)
-        
-        view.addSubview(cityCard)
-        cityCard.translatesAutoresizingMaskIntoConstraints = false
-        
-        // 3. Auto Layout 제약 조건 (화면 중앙 배치)
+        [analogClock, cityCard, customTabBar].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
+
         NSLayoutConstraint.activate([
+            // 1. 아날로그 시계: 화면 상단에서 일정 거리 유지
+            analogClock.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 150),
             analogClock.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            analogClock.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            analogClock.widthAnchor.constraint(equalToConstant: 250),
-            analogClock.heightAnchor.constraint(equalToConstant: 250),
-            
-            // 도시 카드 하단 배치
-            cityCard.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
+            analogClock.widthAnchor.constraint(equalToConstant: 280),
+            analogClock.heightAnchor.constraint(equalToConstant: 280),
+
+            // 2. 도시 카드: 시계 아래에 배치 (중복 방지를 위해 시계 하단 기준으로 배치)
+            cityCard.topAnchor.constraint(equalTo: analogClock.bottomAnchor, constant: 60),
             cityCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             cityCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            cityCard.heightAnchor.constraint(equalToConstant: 100)
+            cityCard.heightAnchor.constraint(equalToConstant: 120),
+
+            // 3. 커스텀 탭 바: 화면 최하단에 고정
+            customTabBar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            customTabBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            customTabBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            customTabBar.heightAnchor.constraint(equalToConstant: 70)
         ])
-        
-        // 4. 레이아웃이 적용되도록 강제 호출
-        view.layoutIfNeeded()
-        analogClock.layer.cornerRadius = 125 // 크기가 결정된 후 곡률 적용
     }
 
     private func startClockTimer() {
