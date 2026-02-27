@@ -58,18 +58,29 @@ class ClockViewController: UIViewController {
 
         // 2. 세로 모드 전용 제약 조건
         portraitConstraints = [
-            analogClock.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 150),
+            analogClock.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            analogClock.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 100),
             analogClock.widthAnchor.constraint(equalToConstant: 280),
             analogClock.heightAnchor.constraint(equalToConstant: 280),
-            cityCard.topAnchor.constraint(equalTo: analogClock.bottomAnchor, constant: 60)
+
+            cityCard.topAnchor.constraint(equalTo: analogClock.bottomAnchor, constant: 40),
+            cityCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            cityCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            cityCard.heightAnchor.constraint(equalToConstant: 120)
         ]
 
         // 3. 가로 모드 전용 제약 조건 (시계를 더 크게 만들고 카드 위치 조정)
+        // --- 가로 모드 제약 조건 (시계는 왼쪽, 카드는 오른쪽) ---
         landscapeConstraints = [
             analogClock.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            analogClock.widthAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.8), // 화면 높이의 80% 크기
-            analogClock.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.8),
-            cityCard.leadingAnchor.constraint(equalTo: analogClock.trailingAnchor, constant: 20) // 시계 옆으로 이동
+            analogClock.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 50),
+            analogClock.widthAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.7),
+            analogClock.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.7),
+
+            cityCard.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            cityCard.leadingAnchor.constraint(equalTo: analogClock.trailingAnchor, constant: 40),
+            cityCard.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -40),
+            cityCard.heightAnchor.constraint(equalToConstant: 140)
         ]
 
         // 초기 방향에 맞춰 활성화
@@ -101,6 +112,20 @@ class ClockViewController: UIViewController {
 #endif // NOT_LANDSCAPE
     }
 
+    private func updateLayoutForOrientation() {
+        if view.frame.width > view.frame.height {
+            // 가로 모드
+            NSLayoutConstraint.deactivate(portraitConstraints)
+            NSLayoutConstraint.activate(landscapeConstraints)
+            customTabBar.isHidden = true // 가로 모드에서 탭바를 숨겨 공간 확보 (선택 사항)
+        } else {
+            // 세로 모드
+            NSLayoutConstraint.deactivate(landscapeConstraints)
+            NSLayoutConstraint.activate(portraitConstraints)
+            customTabBar.isHidden = false
+        }
+    }
+    
     private func startClockTimer() {
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
